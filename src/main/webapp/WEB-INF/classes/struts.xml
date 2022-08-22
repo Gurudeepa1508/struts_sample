@@ -2,24 +2,11 @@
 <!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts
 Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
 <struts>
-    <package name="default" namespace="/" extends="struts-default">
-        <action name="verify" class="login.LoginAction" method="execute">
-           <result name="success">/success.jsp</result>
-            <result name="input">/index.jsp</result>
-            <result name="error">/error.jsp</result>
-        </action>
-
-        <action name="disp" class="login.LoginAction" method="display">
-        <result name="success">/success.jsp</result>
-        <result name="input">/index.jsp</result>
-        <result name="display">/display.jsp</result>
-        <result name="error">/error.jsp</result>
-    </action>
-
-        <action name="remove" class="login.LoginAction" method="remove">
-            <result name="remove">/remove.jsp</result>
-            <result name="error">/error.jsp</result>
+    <package name="default" namespace="/" extends="json-default">
+        <action name="verify" class="employee.LoginAction" method="validateLogin">
+            <result name="display" type="json">
+                <param name="Content-type">application/json</param>
+            </result>
         </action>
     </package>
-
 </struts>
