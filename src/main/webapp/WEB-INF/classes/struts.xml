@@ -8,5 +8,12 @@ Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
                 <param name="Content-type">application/json</param>
             </result>
         </action>
+
+        <action name="get" class="employee.LoginAction" method="GetData">
+            <result name="fetch" type="json">
+                <param name="Content-type">application/json</param>
+            </result>
+        </action>
+
     </package>
 </struts>

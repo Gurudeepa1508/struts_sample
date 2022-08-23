@@ -15,7 +15,6 @@ public class employeeContext implements Serializable {
     }
     public void setUname(String uname) {
         this.uname = uname;
-        System.out.println("setting roll num");
     }
 
     public String getRollnum() {

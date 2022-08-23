@@ -11,8 +11,17 @@ import org.json.simple.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.sql.*;
 import java.text.ParseException;
 public class LoginAction extends ActionSupport implements ServletRequestAware {
+    public String name="";
+    public String password="";
+    public String branch="";
+    public String rollnum="";
+    public int id=0;
+    public String value="";
+    org.json.simple.JSONObject jsonchildbject;
+
     private boolean responseAsJson = true;
     //private JsonObject employeeContextjson;
     private employeeContext employeecontext=new employeeContext();
@@ -24,10 +33,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
         this.employeecontext = employeecontext;
         System.out.println("setting employee context");
     }
-    public String validateLogin() {
-      //  System.out.println("action class" + getEmployeecontext());
-        return "display";
-    }
+
 
     @Override
 //    public void setServletRequest(HttpServletRequest request) {
@@ -62,15 +68,89 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
             }
         }
         String s = sb.toString();
-        Object obj= JSONValue.parse(s);
+        Object obj = JSONValue.parse(s);
+        try {
+            JSONObject jsonObject = (JSONObject) obj;
+            jsonchildbject = (JSONObject) jsonObject.get("employeecontext");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
 
-        org.json.simple.JSONObject jsonObject = (JSONObject) obj;
-        org.json.simple.JSONObject jsonchildbject = (JSONObject) jsonObject.get("employeecontext");
-       // String name=(String)jsonObject.get("uname");
-        System.out.println(jsonObject);
-        System.out.println((String)jsonchildbject.get("uname"));
+
+        name = (String) jsonchildbject.get("uname");
+        password = (String) jsonchildbject.get("password");
+        branch = (String) jsonchildbject.get("branch");
+        rollnum = (String) jsonchildbject.get("rollnum");
+        try {
+            value = (String) jsonchildbject.get("id");
+            id = Integer.parseInt(value);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    public String validateLogin()
+    {
+        Connection connection=null;
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+            connection=DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","Guru@1508");
+            System.out.println("connected succesfully");
+            String InsertQuery="insert into student(name,rollnum,password,branch) values (?,?,?,?)";
+            PreparedStatement ps=connection.prepareStatement(InsertQuery);
+            ps.setString(1,name);
+            ps.setString(2,rollnum);
+            ps.setString(3,password);
+            ps.setString(4,branch);
+            ps.executeUpdate();
+            System.out.println("data inserted");
+        }
+        catch (SQLException throwables)
+        {
+            throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        employeecontext.setUname(name);
+        employeecontext.setBranch(branch);
+        employeecontext.setPassword(password);
+        employeecontext.setRollnum(rollnum);
+        return "display";
+    }
+    public String GetData(){
+        Connection connection=null;
+        try{
+            System.out.println(id);
+            Class.forName("com.mysql.jdbc.Driver");
+            connection=DriverManager.getConnection("jdbc:mysql://localhost:3306/test","root","Guru@1508");
+            System.out.println("connected succesfully");
+            String SelectQuery="select * from student where id="+id+";";
+            System.out.println(SelectQuery);
+            Statement st = connection.createStatement();
+            ResultSet rs=st.executeQuery(SelectQuery);
+            System.out.println(rs);
+            while(rs.next()){
+                name=rs.getString(2);
+                rollnum=rs.getString(3);
+                password=rs.getString(4);
+                branch=rs.getString(5);
+
+                employeecontext.setUname(name);
+                employeecontext.setBranch(branch);
+                employeecontext.setPassword(password);
+                employeecontext.setRollnum(rollnum);
+            }
+        }
+        catch (SQLException throwables)
+        {
+            throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return "fetch";
 
     }
+
+
 }
 
 
